@@ -227,21 +227,26 @@
             你的浏览器不支持音频播放。
         </audio>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const audioPlayers = document.querySelectorAll('.audio-item audio');
+
             audioPlayers.forEach(player => {
-                player.addEventListener('click', function handleFirstClick() {
-                    if (!this.src) {
-                        const audioUrl = this.dataset.src;
+                // 主要改动在这里：我们把事件从 'click' 改为 'play'
+                player.addEventListener('play', function() {
+                
+                    // 检查 src 属性是否已设置。我们只在第一次播放时加载音频。
+                    // 使用 getAttribute('src') 更严谨一些。
+                    if (!player.getAttribute('src')) {
+                     const audioUrl = player.dataset.src;
                         if (audioUrl) {
-                            this.src = audioUrl;
-                            this.load();
-                            this.play();
-                        }
+                            player.src = audioUrl; // 设置音频链接
+                            player.load();       // 让播放器加载新的链接
+                            player.play();       // 确保它开始播放
+                     }
                     }
-                    this.removeEventListener('click', handleFirstClick);
-                }, { capture: true });
+                }, { once: true }); // { once: true } 是一个很棒的特性，能让这个事件只触发一次
             });
         });
     </script>
